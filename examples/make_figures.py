@@ -23,6 +23,7 @@ FIGDIR = REPO / "docs" / "figures"
 FIGDIR.mkdir(exist_ok=True)
 
 COLORS = {"Si2": "black", "Si3": "red", "Si5": "blue", "Si6": "purple"}
+SIGNS = {"Si2": "−", "Si3": "−", "Si5": "−", "Si6": "+"}
 
 
 def fig1(df) -> None:
@@ -34,7 +35,7 @@ def fig1(df) -> None:
             ".",
             ms=3,
             color=COLORS[cav],
-            label=cav,
+            label=f"{cav} ({SIGNS[cav]})",
         )
         a = L.PAPER_ANCHORS[cav]
         ax.plot(
