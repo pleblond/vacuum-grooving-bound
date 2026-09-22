@@ -100,9 +100,8 @@ If you use this code or analysis, please cite the software and the paper
 
 @unpublished{Leblond_grooving_note_2026,
   author = {Leblond, Philippe},
-  title  = {{First search for cumulative vacuum index creep using cryogenic
-             silicon cavity drift logs: open-data analysis and sensitivity
-             projection}},
+  title  = {{First search for cumulative vacuum index creep ('vacuum
+             grooving') in cryogenic silicon cavity drift records}},
   year   = {2026},
   note   = {Draft, \url{https://github.com/pleblond/vacuum-grooving-bound}}
 }
