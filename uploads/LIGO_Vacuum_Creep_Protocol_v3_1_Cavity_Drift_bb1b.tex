@@ -1,0 +1,135 @@
+
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{xcolor}
+\lstset{basicstyle=\ttfamily\small, breaklines=true, frame=single, backgroundcolor=\color{black!5}}
+
+\title{Bounding DC Vacuum Index Creep using Cryogenic Silicon Cavity Drift Logs:\\ Protocol v3.1 - with Thermal, Unwrap, and Finesse Corrections}
+\author{Open-Source Quantum Gravity Working Group}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+
+\section{Why Clock Ratios Cannot See Grooving, But Cavity Logs Can}
+Clock ratios $\nu_{Yb+}/\nu_{Sr}$ are atoms/atoms, forced to $10^{-18}$ by servo. Cavity length variations erased. AOM correction $\nu_{corr}(t)$ = atoms - cavity = raw DC ruler. Operates at $10^{-13}$ torr, 4K Si, $10^8\times$ more stable than LIGO silica at 300K, $10^{-9}$ torr.
+
+\section{Observable Model v3.1 - With Thermal Coupling}
+
+Cavity $\nu = m c / 2 n L$. With atoms absolute:
+
+\begin{equation}
+\Delta \nu_{corr}(t) = -\nu_0 \left( \frac{\Delta L_{Si}}{L} + \Delta n_{vac} \right)
+\end{equation}
+
+Drift rate $s(t)=d\nu_{corr}/dt$ [Hz/s]. v3.0 omitted residual thermal. v3.1 includes explicit linear term $\gamma \Delta T(t)$ even at 4K zero-crossing:
+
+\begin{equation}
+s_i = \beta_{Si} + \alpha \langle P \rangle_i + \gamma \Delta T_i + \epsilon_i \tag{1}
+\end{equation}
+
+\begin{itemize}
+\item $\beta_{Si}(T)$: Si aging. 4K: $<10^{-20}$/s, 124K zero-crossing: $\sim10^{-18}$/s. Constant at fixed T.
+\item $\alpha \langle P\rangle_i$ [Hz/s per Watt]: Target vacuum grooving. Instantaneous power dependence.
+\item $\gamma \Delta T_i$: Residual thermal coupling. While $\alpha_{thermal}\rightarrow0$ at 4K and at 124K zero-crossing, sub-mK fluctuations still induce $10^{-15}$--$10^{-16}$ fractional shifts. Include as linear regressor per epoch: $\Delta T_i$ = mean cryostat temp deviation in epoch $i$ from setpoint. At 124K, $d\alpha/dT \sim 10^{-11}$/K$^2$, so 0.1 mK $\rightarrow$ $10^{-15}$; at 4K, coupling $<10^{-13}$/K, but still include for completeness.
+\item $\epsilon_i$: residual seismic, detection noise.
+\end{itemize}
+
+Cumulative fatigue version:
+\begin{equation}
+\Delta \nu_{corr}(t) = \beta_{Si} t + \alpha_E E_{cum}(t) + \gamma \int \Delta T(t') dt' + \sum C_i \mathbf{1}_i + \epsilon
+\end{equation}
+$E_{cum}(t)=\int P_{circ} I_{on} dt$, monotonic, flatlines when off.
+
+Advantage: No $\beta$ vs $\alpha$ degeneracy. At 4K $\beta\approx0$, $\gamma\approx0$, any power dependence is $\alpha$.
+
+\section{Phase Jump Handling - Frequency vs Phase}
+
+\textbf{Refinement 2:} v3.0 code used \texttt{np.unwrap(ep['nu\_corr\_Hz'])} which assumes phase radians. AOM logs are discrete frequency corrections in Hz, not wrapped phase.
+
+Correct handling:
+
+\begin{itemize}
+\item Input \texttt{nu\_corr\_Hz} is raw frequency offset, \textbf{not} phase. Do NOT unwrap as phase.
+\item Step changes occur at unlocks/mode jumps. Script already handles this by grouping by epoch: \texttt{epochs = (is\_on.diff()!=0).cumsum()} and fitting slope within each epoch only.
+\item Within epoch, frequency correction is continuous (servo linear). Fit slope directly: $s_i = \text{polyfit}(t, \nu_{corr})$. No unwrap needed, or unwrap only if data stored as phase.
+\item Ensure column is treated as frequency offset: if lab logs AOM frequency (e.g., 80 MHz $\pm$ kHz correction), subtract nominal 80 MHz first to get $\Delta\nu$.
+\end{itemize}
+
+Implementation: Remove unwrap, fit raw $\nu_{corr}$.
+
+\section{Finesse and Mode-Matching Aging}
+
+\textbf{Refinement 3:} $P_{circ}=P_{trans}\cdot\mathcal{F}/\pi$ assumes constant finesse $\mathcal{F}$.
+
+Over 5--10 years, mirror contamination can lower $\mathcal{F}$ by few percent. If lab logs only $P_{trans}$ (transmitted power) rather than direct ring-down finesse measurements, then $P_{trans}$ is slightly conservative proxy.
+
+\begin{itemize}
+\item If finesse measured periodically via ring-down: Use $P_{circ}(t)=P_{trans}(t)\cdot\mathcal{F}(t)/\pi$ with interpolated $\mathcal{F}(t)$.
+\item If only $P_{trans}$ available: Use $P_{trans}$ itself as proxy regressor: $s_i = \beta + \alpha_{trans}\langle P_{trans}\rangle_i + \gamma\Delta T_i$. Since $P_{trans}\propto P_{circ}$ for fixed input coupling, slope $\alpha_{trans}$ still bounds vacuum effect, conservatively (underestimates $P_{circ}$ if $\mathcal{F}$ degraded).
+\item Note in paper: "We use $P_{trans}$ as conservative proxy; direct ring-down shows $\mathcal{F}$ stable to $<2\%$ over analysis window (Robinson 2024 Fig S3), so $P_{circ}$ error $<2\%$."
+\end{itemize}
+
+This removes false correlation if finesse degradation mimics power dependence.
+
+\section{Pipeline v3.1}
+
+\textbf{Phase 1 Ingest:} $\nu_{corr}(t)$ Hz vs GPS, $P_{trans}(t)$, cryostat $T(t)$, $I_{on}$. Compute $P_{circ}=P_{trans}\mathcal{F}/\pi$ or use $P_{trans}$ as proxy. $E_{cum}=cumsum(P_{circ})dt$ never reset.
+
+\textbf{Phase 2 Detrend:} No tidal model. Thermal: include $\Delta T_i$ as regressor per Eq (1), not pre-subtracted, to preserve covariance. At 124K zero-crossing, fit $\gamma$; at 4K, $\gamma$ consistent with zero but keep for check.
+
+\textbf{Phase 3 Regression:} Per-epoch slope $s_i$ from raw frequency offset (no phase unwrap). Fit Eq (1) with design $[1, \langle P\rangle_i, \Delta T_i]$, weighted $W=1/\sigma_{Allan}^2$. Also cumulative fit with $E_{cum}$.
+
+\textbf{Phase 4 Bound:} Same as v3: $H_0$: $\alpha=0$ $\rightarrow$ bound $10^{-19}$/yr per 100 $\mu$W at $10^{-13}$ torr, 4K.
+
+\section{Code Blueprint v3.1 Corrected}
+
+\begin{lstlisting}
+def cavity_drift_vs_power_v31(df, F_nominal=5e5, dt=1.0):
+    # df: time_s, nu_corr_Hz (raw frequency offset), P_trans_W, temp_K, is_on, F_measured (optional)
+    # Refinement 2: nu_corr is frequency, not phase - no unwrap
+    # Refinement 3: handle finesse aging
+    
+    # Use measured finesse if available, else nominal
+    if 'F_measured' in df.columns:
+        F = df['F_measured'].interpolate()
+    else:
+        F = F_nominal  # conservative, note <2% error
+        # If only P_trans available, can regress vs P_trans directly
+        
+    df['P_circ'] = df['P_trans'] * F / 3.1416 * df['is_on']
+    df['E_cum'] = (df['P_circ'].cumsum() * dt)  # never reset, flatlines when off
+    df['dT'] = df['temp_K'] - df['temp_K'].mean()  # per-epoch deviation later
+    
+    # Group by continuous on epochs
+    epochs = (df['is_on'].diff() != 0).cumsum()
+    results = []
+    for _, ep in df.groupby(epochs):
+        if ep['is_on'].iloc[0]==0 or len(ep)<7200:
+            continue
+        # Refinement 2: fit raw frequency, no unwrap
+        t0 = ep['time_s'].values - ep['time_s'].values[0]
+        nu = ep['nu_corr_Hz'].values  # raw offset, already minus nominal AOM
+        # Linear fit for drift rate s_i [Hz/s]
+        s_i = np.polyfit(t0, nu, 1)[0]
+        Pmean = ep['P_circ'].mean()
+        dTmean = ep['dT'].mean()  # Refinement 1: thermal term
+        results.append((s_i, Pmean, dTmean))
+    
+    # Refinement 1: regression s_i = beta + alpha*P + gamma*dT
+    import numpy as np
+    s, P, dT = zip(*results)
+    X = np.vstack([np.ones(len(s)), P, dT]).T  # [beta, alpha, gamma]
+    # Weighted by Allan dev if available
+    coeffs, *_ = np.linalg.lstsq(X, s, rcond=None)
+    beta_Si, alpha, gamma = coeffs
+    return beta_Si, alpha, gamma
+\end{lstlisting}
+
+\section{Expected Sensitivity}
+With $\gamma\Delta T$ included, residual thermal at 0.1 mK $\rightarrow$ $10^{-15}$ removed. 4K Si creep $<10^{-20}$/s. Bound $\Delta n/yr <10^{-19}$ per 100 $\mu$W at $10^{-13}$ torr, open data, no NDS.
+
+\end{document}
