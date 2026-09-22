@@ -8,6 +8,12 @@ Companion code for **"First search for cumulative vacuum index creep
 bounding slow vacuum-index drift ("grooving") from cryogenic silicon cavity
 AOM-correction logs.
 
+Existing vacuum-nonlinearity searches test only instantaneous responses,
+assuming a vacuum with zero memory; cavity drift is treated as background
+and subtracted. No prior study has tested or bounded cumulative vacuum
+hysteresis — this repository establishes the first quantitative upper
+bounds from published open drift records.
+
 ## Background
 
 Clock ratios (Yb+/Sr) servo away cavity drift, so they cannot see it. The
