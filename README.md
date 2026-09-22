@@ -1,7 +1,9 @@
 # First search for cumulative vacuum index creep
 
-Companion code for **"First search for cumulative vacuum index creep using
-cryogenic silicon cavity drift logs"**
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22886215.svg)](https://doi.org/10.5281/zenodo.22886215)
+
+Companion code for **"First search for cumulative vacuum index creep
+('vacuum grooving') in cryogenic silicon cavity drift records"**
 ([paper PDF](docs/vacuum_grooving_note.pdf), [source](docs/vacuum_grooving_note.tex)):
 bounding slow vacuum-index drift ("grooving") from cryogenic silicon cavity
 AOM-correction logs.
