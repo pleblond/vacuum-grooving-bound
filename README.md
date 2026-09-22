@@ -98,3 +98,30 @@ four cryogenic Si cavities (Si2/Si3/Si5 at 124 K, Si6 at 17 K):
 2. Run the CLI; check `R²`, `γ` consistency with zero at 4 K, and the
    cumulative `E_cum` cross-check line in the notes.
 3. Quote `dn_per_year_bound_95` per 100 µW with the finesse caveat from R3.
+
+## Cite this work
+
+If you use this code or analysis, please cite the software and the draft
+(see `CITATION.cff`, rendered by GitHub as "Cite this repository"):
+
+```bibtex
+@software{Leblond_vacuum_grooving_bound_2026,
+  author  = {Leblond, Philippe},
+  title   = {{vacuum-grooving-bound}},
+  url     = {https://github.com/pleblond/vacuum-grooving-bound},
+  license = {MIT},
+  year    = {2026}
+}
+
+@unpublished{Leblond_grooving_note_2026,
+  author = {Leblond, Philippe},
+  title  = {{First search for cumulative vacuum index creep using cryogenic
+             silicon cavity drift logs: open-data analysis and sensitivity
+             projection}},
+  year   = {2026},
+  note   = {Draft, \url{https://github.com/pleblond/vacuum-grooving-bound}}
+}
+```
+
+Analyses built on the digitized drift record should also cite Lee et al.,
+PRL 136, 033801 (2026), arXiv:2509.13503.

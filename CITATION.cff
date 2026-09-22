@@ -1,0 +1,21 @@
+cff-version: 1.2.0
+message: If you use this software or analysis, please cite it using the metadata from this file.
+title: vacuum-grooving-bound
+abstract: Protocol v3.1 pipeline bounding DC vacuum index creep from cryogenic
+  silicon cavity drift logs, with digitized Lee et al. 2026 drift records and
+  sensitivity projections.
+authors:
+  - family-names: Leblond
+    given-names: Philippe
+license: MIT
+repository-code: https://github.com/pleblond/vacuum-grooving-bound
+date-released: '2026-09-22'
+preferred-citation:
+  type: unpublished
+  title: 'First search for cumulative vacuum index creep using cryogenic silicon
+    cavity drift logs: open-data analysis and sensitivity projection'
+  authors:
+    - family-names: Leblond
+      given-names: Philippe
+  year: 2026
+  notes: Draft in docs/vacuum_grooving_note.tex

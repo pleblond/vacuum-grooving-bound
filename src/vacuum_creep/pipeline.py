@@ -171,7 +171,8 @@ def _add_power_columns(df: pd.DataFrame, cfg: PipelineConfig, notes: list[str]) 
         finesse = pd.Series(float(cfg.f_nominal), index=out.index, dtype=float)
         notes.append(
             f"Finesse: no F_measured column; nominal F={cfg.f_nominal:.3g} used "
-            "(conservative; <~2% P_circ error per Robinson 2024 Fig S3)."
+            "(approximate; finesse drift unquantified in open data;"
+            " use periodic ring-down F_measured when available)."
         )
 
     out["P_circ_W"] = out["P_trans_W"].to_numpy(dtype=float) * finesse.to_numpy(dtype=float) / PI * on
