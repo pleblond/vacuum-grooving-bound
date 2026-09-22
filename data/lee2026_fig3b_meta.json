@@ -1,0 +1,52 @@
+{
+  "arxiv": "2509.13503v1",
+  "figure": "figures/drift_07102025.jpg",
+  "method": "color segmentation vs hand-calibrated broken-log axes",
+  "x_map": {
+    "x0": 362,
+    "x1": 1832,
+    "day0": 100.0,
+    "day1": 10000.0
+  },
+  "top_cal_rows_vals": [
+    [
+      18,
+      1000.0
+    ],
+    [
+      212,
+      100.0
+    ],
+    [
+      418,
+      10.0
+    ]
+  ],
+  "bot_cal_rows_vals": [
+    [
+      706,
+      10.0
+    ],
+    [
+      902,
+      100.0
+    ],
+    [
+      1085,
+      1000.0
+    ]
+  ],
+  "text_boxes_excluded": {
+    "Si6": [
+      [
+        975,
+        150,
+        1200,
+        360
+      ]
+    ]
+  },
+  "bins": 55,
+  "min_pts_per_bin": 8,
+  "stated_digitization_error": "~15% per point; endpoints better taken from paper text"
+}
