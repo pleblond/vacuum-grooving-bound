@@ -4,7 +4,7 @@ __pycache__/
 .pytest_cache/
 *.png
 *.pdf
-!docs/*.pdf
+!docs/**/*.pdf
 *.aux
 *.log
 *.out

@@ -11,70 +11,76 @@
 \maketitle
 
 \begin{abstract}
-We propose a search for cumulative vacuum refractive index creep, $\Delta n_{\rm vac}(t)=\alpha_E \int P_{\rm circ} I_{\rm on} dt$, using long-term drift logs of cryogenic single-crystal silicon cavities. Standard analyses fit cavity drift versus age, $s(t)=\beta_{Si}$, and attribute residual to material relaxation. We introduce Protocol v3.1: $s_i = \beta_{Si}(t) + \alpha \langle P_{\rm circ}\rangle_i + \gamma_1\Delta T_i + \gamma_2\Delta T_i^2$, with finesse aging $P_{\rm circ}=P_{\rm trans}\mathcal{F}/\pi$ and raw frequency (no unwrap needed for published frequency; see Sec.~2). 
-
-Pipeline validated on synthetic null and injected $\alpha=3\times10^{-4}$: 30/30 tests pass, null $\hat\alpha=-6.4\pm4.3\times10^{-5}$ consistent with zero (no false detection), injected recovered $2.36\pm0.43\times10^{-4}$, $R^2>0.999$, $\gamma$ recovers its injected value.
-
-Using only published Fig.~3b from Lee et al., PRL 136, 033801 (2026) \cite{lee2026} for Si2, Si3, Si5 (124K) and Si6 (17K) over $>10$yr, digitized settled drifts are Si2 $-57\pm8$, Si3 $-20\pm4$, Si5 $-18\pm13$, Si6 $+18\pm13$ $\mu$Hz/s, with Si2 integral $-29.5$ kHz over days 260--3798 vs published $-44$ kHz/10yr (missing steep days 0--260 imply $-646\,\mu$Hz/s mean, cf Si3 $-883$ at day 269). No $P_{\rm trans}(t)$ is published. We therefore report conditional bound: if the circulating power varied by $\ge X$ across epochs with no correlated drift beyond settled scatter $\sigma$, then $|\alpha|\le\sigma/\Delta P$. For Si6 settled $\sigma=12.5\,\mu$Hz/s at $P_{\rm circ}\approx13.5$ mW (the only cavity with published power), this gives projection ladder in Table~2. We lead with $X=10\%$, plausible during commissioning/optimization, yielding $|\Delta n|<1.5\times10^{-13}$/yr per 100\,$\mu$W in cryogenic UHV at 17--124K. Ladder is $1.5\times10^{-12}$ (1\%), $1.5\times10^{-13}$ (10\%), $1.5\times10^{-14}$ (factor 2). Large models requiring $\gtrsim10^{-12}$/yr per 100\,$\mu$W excluded only if $\ge1\%$ excursions can be established; reaching $10^{-19}$ requires measured $P_{\rm trans}(t), T_{\rm cryo}(t), \mathcal{F}(t)$ or intentional dither. Si6 positive drift (shortening) vs others negative is a qualitative puzzle for any common-mode power-proportional origin; Si2/3/5 powers are unpublished so a quantitative sign test awaits the logs.
+Long-term drift records of cryogenic silicon cavities can bound cumulative vacuum refractive-index creep of the form $\Delta n_{\rm vac}=\alpha_E\!\int\! P_{\rm circ}\,dt$, a signature with no counterpart in instantaneous vacuum-nonlinearity searches. Clock frequency ratios erase cavity drift by construction; the servo's AOM correction is the raw drift observable. We present an open-data analysis that regresses per-epoch drift rates against circulating power together with thermal and silicon-aging terms, validated on synthetic logs with known injected coefficients. Applied to the published decade-long drift histories of Si2, Si3, Si5 (124K) and Si6 (17K), digitized settled rates are Si2 $-57\pm8$, Si3 $-20\pm4$, Si5 $-18\pm13$, Si6 $+18\pm13$ $\mu$Hz/s, with the Si2 record integrating to $-29.5$ kHz over days 260--3798 (published $-44$ kHz/10yr; the gap implies $-646\,\mu$Hz/s mean over the steep un-digitized days 0--260, consistent with Si3's $-883$ at day 269). With no published power logs, we report conditional bounds: had the circulating power varied by $\ge X$ across epochs with no correlated drift beyond the settled scatter $\sigma$, then $|\alpha|\le\sigma/\Delta P$. For Si6 ($\sigma=12.5\,\mu$Hz/s, $P_{\rm circ}\approx13.5$ mW, the only cavity with published power) this gives $|\Delta n|<1.5\times10^{-13}$/yr per 100\,$\mu$W under plausible $\ge10\%$ excursions ($1.5\times10^{-12}$ at 1\%, $1.5\times10^{-14}$ at factor 2). The leading systematic is the known power-dependent drift of cryogenic cavities; reaching $10^{-19}$ requires logged power and temperature or an intentional power dither.
 \end{abstract}
 
 \section{Introduction}
-Vacuum refractive index from strong fields is searched as instantaneous $n_2 I$ with no memory: PVLAS \cite{pvlas2020}, BMV \cite{battesti2013}, OVAL \cite{oval2017}. Lorentz-violation and $\alpha$-variation searches using Si cavities compare cavity vs atom and look for sinusoidal residuals, explicitly removing linear drift \cite{muller2003,kennedy2020}. Cumulative grooving, where photon dose creates persistent $\Delta n$, has not been searched. The Euler--Heisenberg effective action \cite{heisenberg1936} predicts an instantaneous vacuum Kerr index $n_2\approx1.6\times10^{-33}$ cm$^2$/W \cite{vackerr2019} with no cumulative term; PVLAS bounds static-field vacuum birefringence at $\Delta n=(12\pm17)\times10^{-23}$ at 2.5 T \cite{pvlas2020}. Axion-like particles add instantaneous EHS-like terms \cite{alpehs2018} and dispersive corrections \cite{vackerr2019}, while domain walls imprint discrete jumps rather than dose accumulation; we know of no concrete model predicting $\Delta n_{\rm vac}\propto\int P\,dt$, adopted here as a purely phenomenological parametrization.
+Vacuum refractive index from strong fields is searched as an instantaneous $n_2 I$ response with no memory: PVLAS \cite{pvlas2020}, BMV \cite{battesti2013}, OVAL \cite{oval2017}. Lorentz-violation and $\alpha$-variation searches using silicon cavities compare cavity against atom and look for sinusoidal residuals, explicitly removing linear drift \cite{muller2003,kennedy2020}. Cumulative grooving, where photon dose creates a persistent $\Delta n$, has not been searched. The Euler--Heisenberg effective action \cite{heisenberg1936} predicts an instantaneous vacuum Kerr index $n_2\approx1.6\times10^{-33}$ cm$^2$/W \cite{vackerr2019} with no cumulative term; PVLAS bounds static-field vacuum birefringence at $\Delta n=(12\pm17)\times10^{-23}$ at 2.5 T \cite{pvlas2020}. Axion-like particles add instantaneous EHS-like terms \cite{alpehs2018} and dispersive corrections \cite{vackerr2019}, while domain walls imprint discrete jumps rather than dose accumulation; we know of no concrete model predicting $\Delta n_{\rm vac}\propto\int P\,dt$, adopted here as a purely phenomenological parametrization.
 
-Cryogenic Si cavities in cryogenic UHV, operated at 17--124K in this analysis, drift at $\sim10^{-19}$/s fractional \cite{lee2026} --- roughly $10^3\times$ slower than typical ULE cavities (kHz/day vs Hz/day \cite{lee2026}), enabling a DC search.
+Cryogenic silicon cavities in cryogenic UHV, operated at 17--124K in this analysis, drift at $\sim10^{-19}$/s fractional \cite{lee2026} --- roughly $10^3\times$ slower than typical ULE cavities (kHz/day vs Hz/day \cite{lee2026}), enabling a DC search for dose-dependent effects.
 
-\section{Protocol v3.1}
+\section{Method}
 Clock ratios ($\nu_{Yb+}/\nu_{Sr}$) are atoms-vs-atoms, servoed to $10^{-18}$; cavity drift is erased from them by construction. The servo's AOM correction $\nu_{corr}(t)$ is atoms-minus-cavity: the raw DC ruler for cavity length plus vacuum index. With atoms absolute and cavity $\nu=mc/2nL$:
 \begin{equation}
-\Delta\nu_{corr}(t) = -\nu_0\left(\frac{\Delta L_{Si}}{L}+\Delta n_{vac}\right)
+\Delta\nu_{corr}(t) = -\nu_0\left(\frac{\Delta L_{Si}}{L}+\Delta n_{vac}\right).
 \end{equation}
-Previous versions fit $s(t)=\beta$. v3.1 fits drift rates $s_i=d\nu_{corr}/dt$ per 10-day epoch, with limitations noted in Sec.~5:
+We fit drift rates $s_i=d\nu_{corr}/dt$ per epoch $i$ (10-day bins matching published drift records):
 \begin{equation}
-s_i = \beta_{Si}(t) + \alpha \langle P_{\rm circ}\rangle_i + \gamma_1\Delta T_i + \gamma_2\Delta T_i^2
+s_i = \beta_{Si}(t) + \alpha \langle P_{\rm circ}\rangle_i + \gamma_1\Delta T_i + \gamma_2\Delta T_i^2 + \epsilon_i,
+\label{eq:model}
 \end{equation}
-with:
-\begin{itemize}
-\item $s_i = d\nu/dt$ per 10-day bin from 10-day binned \emph{frequency} vs maser/optical clock, not beat-note phase. PTB/JILA track cavity frequency against masers calibrated to timescales (e.g.\ UTC(NIST) \cite{robinson2019}) or against optical clocks with standard systematic corrections; if re-analyzing raw beat phase, unwrap $2\pi$ before differentiating (a $2\pi$ slip injects $1/\tau$ Hz steps: $\sim$100~mHz at 10~s sampling). For Fig.~3b data \cite{lee2026} we use published frequency drift, so no unwrap needed, but code retains unwrap for raw logs. If labs log absolute AOM frequency (e.g.\ 80 MHz $\pm$ kHz correction), subtract the nominal first.
-\item $\langle P_{\rm circ}\rangle_i = \langle P_{\rm trans}\rangle_i \mathcal{F}_i/\pi$, $\mathcal{F}$ from periodic ring-down, interpolated as $\mathcal{F}(t)$ when available; else $P_{trans}$ itself as proxy regressor $\alpha_{trans}$ (conservative: underestimates $P_{circ}$ if $\mathcal{F}$ degraded).
-\item $\Delta T_i$ cryostat temperature, quadratic term for 124K zero-crossing; at 124K, $d\alpha/dT\sim10^{-11}$/K$^2$, so 0.1 mK $\to$ $10^{-15}$.
-\item Allan-weighted: $w_i=1/\sigma_{\rm Allan,i}^2$
-\end{itemize}
-$\alpha$ target, $\beta_{Si}(t)$ aging (see Sec.~5 for decay), $\gamma$ thermal. With constant $P$, $\beta$ and $\alpha\langle P\rangle$ degenerate. Variation $\Delta P$ breaks degeneracy.
+where $\beta_{Si}$ is silicon aging, $\alpha$ the target grooving coefficient in Hz/s per Watt, $\gamma_{1,2}$ the thermal coupling (quadratic term retained for the 124K zero-crossing, where $d\alpha/dT\sim10^{-11}$/K$^2$ makes 0.1 mK $\to$ $10^{-15}$), and $\epsilon_i$ residual noise. With constant power, $\beta$ and $\alpha\langle P\rangle$ are degenerate; power variation across epochs breaks the degeneracy.
 
-The cumulative (fatigue) form fits $\Delta\nu_{corr}(t)=\beta_{Si}t+\alpha_E E_{cum}(t)+\gamma\!\int\!\Delta T\,dt'+\sum C_i{\bf1}_i+\epsilon$ with $E_{cum}(t)=\int P_{circ}I_{on}dt$ never reset (flatlines when unlocked); step dummies $C_i$ absorb relock offsets. Unlock/mode-jump steps are handled by epoch grouping, fitting slopes only within locked epochs.
+Three details matter. First, temperature enters as regressors, never pre-subtracted, preserving covariance; even at zero-crossings, sub-mK fluctuations induce $10^{-15}$--$10^{-16}$ shifts. Second, AOM logs are frequency offsets in Hz, not wrapped phase: slopes are fit on the raw offset within each locked epoch (unlock and mode-jump steps handled by epoch grouping), with nominal AOM frequency subtracted first; phase unwrapping applies only to raw beat-note phase. Cavity frequency is tracked against masers calibrated to timescales (e.g.\ UTC(NIST) \cite{robinson2019}) or against optical clocks with standard systematic corrections. Third, $P_{\rm circ}=P_{trans}\mathcal{F}/\pi$ uses time-interpolated ring-down finesse $\mathcal{F}(t)$ when available (Si2/Si3 finesse $\approx$ 500\,000 \cite{matei2017}, Si6 470\,000 \cite{lee2026}); else $P_{trans}$ itself serves as proxy regressor, conservative against finesse degradation over the 5--10 yr span. Epoch slopes use Allan weights $w_i=1/\sigma_{{\rm Allan},i}^2$ where available.
 
-Pipeline: (1) ingest $\nu_{corr}$, $P_{trans}$, $T$, $I_{on}$; (2) keep thermal as regressors, never pre-subtracted, preserving covariance; (3) WLS epoch regression plus cumulative cross-check; (4) $H_0$: $\alpha=0$ bound. Implementation: \url{https://github.com/pleblond/vacuum-grooving-bound}.
+Silicon aging is visibly time-dependent (Sec.~\ref{sec:open}), so $\beta_{Si}(t)$ is treated two independent ways: (a) separate intercepts per time window, and (b) a joint $\beta_0+\beta_1\exp(-t/\tau)$ fit with $\tau$ found by grid search. Both give consistent answers (Sec.~\ref{sec:sys}); the headline numbers use settled windows where aging is approximately constant.
 
-\section{Pipeline validation (synthetic)}
-Synthetic $s_i$ with known $\alpha_{true}$, $\beta$, $\gamma$, noise matching Si2 settled scatter $8\,\mu$Hz/s.
+The cumulative (fatigue) form fits $\Delta\nu_{corr}(t)=\beta_{Si}t+\alpha_E E_{cum}(t)+\gamma\!\int\!\Delta T\,dt'+\sum C_i{\bf1}_i+\epsilon$ with $E_{cum}(t)=\int P_{circ}I_{on}dt$ never reset (flatlining when unlocked); step dummies $C_i$ absorb relock offsets. The pipeline ingests $\nu_{corr}$, $P_{trans}$, $T$, and lock flags, keeps thermal terms as regressors, runs the epoch regression plus the cumulative cross-check, and reports the $H_0$: $\alpha=0$ bound.
+
+\section{Validation on synthetic data}
+We generated cavity logs with known $(\beta,\alpha,\gamma)$ plus thermal wander, relock steps, and readout noise matched to Si2's settled scatter. Table~\ref{tab:mc} summarizes recovery.
 
 \begin{table}[h]
 \centering
+\caption{Monte Carlo recovery of injected coefficients (truth $\alpha=3\times10^{-4}$ Hz/s/W where injected).}
+\label{tab:mc}
 \begin{tabular}{@{}lcc@{}}
 \toprule
-Case & $\hat\alpha$ & Result \\
+Case & Injected & Recovered \\
 \midrule
-Null $\alpha=0$ & $-6.4e-05\pm4.3e-05$ & consistent zero, no false detection \\
-Injected $\alpha=3e-4$ & $2.36e-04\pm4.3e-05$ & 20\% low (1.5$\sigma$ seed noise), $R^2>0.999$ \\
-Thermal deconfound & $\gamma$ recovers injected value & validated \\
-Finesse/proxy & $\mathcal{F}$ vs $P_{\rm trans}$ agreement & validated \\
-Fail-safe & 30/30 tests pass & \\
+Null & $\alpha=0$ & $-6.4\pm4.3\times10^{-5}$, consistent with zero \\
+Signal & $\alpha=3\times10^{-4}$ & $2.36\pm0.43\times10^{-4}$, $R^2>0.999$ \\
+Thermal & $\gamma=20$ & recovers injected value, $\alpha$ unbiased \\
+Decaying $\beta$, single intercept & $\alpha=3\times10^{-4}$ & $-3.36\times10^{-4}$ (sign flip: biased) \\
+Decaying $\beta$, windowed (a) & $\alpha=3\times10^{-4}$ & $2.99\times10^{-4}$ \\
+Decaying $\beta$, joint exp (b) & $\alpha=3\times10^{-4}$, $\tau=80$ ks & $3.04\times10^{-4}$, $\tau$ within 12\% \\
+Finesse vs $P_{trans}$ proxy & --- & agree in sign \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Pipeline does not hide power correlation in $\beta$.
+Power-correlated aging defeats a single-intercept fit (wrong sign) while both aging treatments recover the truth; thermal coupling is absorbed by $\gamma$ without leaking into $\alpha$.
 
-\section{Open data: Lee et al. 2026 Fig 3b}
-Digitized Fig.~3b drift rates \cite{lee2026} vs cavity age (time since optical contact bonding).
+\section{Open data}
+\label{sec:open}
+Lee et al.\ report drift rates of four silicon cavities versus age in their Fig.~3b, computed from 10-day binned frequencies \cite{lee2026}. The arXiv source package contains the figure images but no machine-readable supplement, so we digitized Fig.~3b by color segmentation against hand-calibrated broken-log axes, taking median rates in 55 log-spaced age bins per cavity. Per-point digitization error is $\sim$15\%, dominated by axis calibration; x-axis tick labels intruding into the plot area were blanked. The digitization reproduces the published recent rates and the Si2 cumulative integral (Fig.~\ref{fig:digitized}, Table~\ref{tab:cav}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/fig1_digitized.pdf}
+\caption{Redigitized Fig.~3b of Lee et al.\ \cite{lee2026}: drift-rate magnitude vs cavity age for Si2, Si3, Si5 (124K) and Si6 (17K). Stars mark the recent rates quoted in the text.}
+\label{fig:digitized}
+\end{figure}
 
 \begin{table}[h]
 \centering
+\caption{Cavity parameters, settled drift rates, and span integrals.}
+\label{tab:cav}
 \begin{tabular}{@{}lcc@{}}
 \toprule
 Cavity & Settled drift [$\mu$Hz/s] & Span integral \\
 \midrule
-Si2 (21cm,124K,SiO2/Ta2O5) & $-57\pm8$ & $-29.5$ kHz over days 260--3798 (paper $-44$ kHz/10yr) \\
+Si2 (21cm,124K,SiO2/Ta2O5) & $-57\pm8$ & $-29.5$ kHz, days 260--3798 (paper $-44$ kHz/10yr) \\
 Si3 (21cm,124K,SiO2/Ta2O5) & $-20\pm4$ & $-27.4$ kHz \\
 Si5 (21cm,124K,GaAs/AlGaAs) & $-18\pm13$ & $-20.9$ kHz \\
 Si6 (6cm,17K,GaAs/AlGaAs) & $+18\pm13$ & $+4.6$ kHz \\
@@ -82,56 +88,47 @@ Si6 (6cm,17K,GaAs/AlGaAs) & $+18\pm13$ & $+4.6$ kHz \\
 \end{tabular}
 \end{table}
 
-Si2 integral check validates digitization. Si6 sign flip: positive (shortening, glass-like) vs others negative (lengthening, Si-like). Only Si6's $P_{\rm circ}\approx13.5$ mW is published (90 nW $\times$ 470000/$\pi$); Si2/3/5 powers are unknown.
+The Si2 integral reconciles with the published $-44$ kHz/10yr: the missing steep days 0--260 imply $-646\,\mu$Hz/s mean, consistent with Si3's $-883$ at day 269 for identically constructed cavities. Si6 drifts positive (shortening, glass-like) while the others drift negative (lengthening); Si2/3/5 powers are unpublished, so a quantitative sign test awaits the logs, but the flip is a qualitative puzzle for any common-mode power-proportional origin.
 
-\section{$\alpha$-sensitivity projection}
-No $P_{\rm trans}(t)$ published. We report conditional bound: if circulating power varied by $\ge X$ across epochs with no correlated drift beyond settled scatter $\sigma$, then $|\alpha|\le\sigma/\Delta P$.
+\section{Sensitivity projection}
+No $P_{\rm trans}(t)$ is published. We report conditional bounds: had the circulating power varied by $\ge X$ across epochs with no correlated drift beyond the settled scatter $\sigma$, then $|\alpha|\le\sigma/\Delta P$.
 
 \begin{table}[h]
 \centering
-\caption{Projection ladder: bound on $|\alpha|$ and $\Delta n$/yr per 100\,$\mu$W if power excursions of size $X$ occurred with no observed drift correlation beyond scatter $\sigma$. For Si6 $\sigma=12.5\,\mu$Hz/s, $P_{\rm circ}\approx13.5$ mW (90 nW transmission $\times$ 470000/$\pi$). 1\% row requires establishing $\ge1\%$ excursions; lead defensible number is 10\% row, plausible during commissioning/optimization when $P_{\rm trans}$ is tuned for RAM. Table is projection, not measurement, until $\Delta P$ confirmed from logs.}
+\caption{Projection ladder for Si6 ($\sigma=12.5\,\mu$Hz/s, $P_{\rm circ}\approx13.5$ mW from 90 nW $\times$ 470000/$\pi$): bound on $|\alpha|$ and $\Delta n$/yr per 100\,$\mu$W if excursions of size $X$ occurred with no observed drift correlation beyond scatter. The 10\% row is the lead number, plausible when $P_{\rm trans}$ is tuned for RAM during commissioning/optimization. Projection, not measurement, until $\Delta P$ is confirmed from logs.}
 \begin{tabular}{@{}ccc@{}}
 \toprule
 Excursion $X$ (assumed) & Bound $|\alpha|$ [Hz/s/W] & $\Delta n$/yr per 100$\mu$W \\
 \midrule
-1\% (0.135 mW) & $9.3e-02$ & $1.5e-12$ \\
-\textbf{10\% (1.35 mW)} & $9.3e-03$ & $1.5e-13$ \\
-100\% (factor 2, 13.5 mW) & $9.3e-04$ & $1.5e-14$ \\
+1\% (0.135 mW) & $9.3\times10^{-2}$ & $1.5\times10^{-12}$ \\
+\textbf{10\% (1.35 mW)} & $9.3\times10^{-3}$ & $1.5\times10^{-13}$ \\
+100\% (factor 2, 13.5 mW) & $9.3\times10^{-4}$ & $1.5\times10^{-14}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Using $\Delta\nu/\nu = -\Delta L/L = -\Delta n (L_{\rm vac}/L)$, $L_{\rm vac}\sim L$, $\nu=194$ THz. Lead defensible number is $1.5\times10^{-13}$/yr per 100$\mu$W under $\ge10\%$ excursion assumption. $1.5\times10^{-12}$ requires establishing only 1\% excursions, which is an assumed stability figure, not documented variation.
+Using $\Delta\nu/\nu=-\Delta L/L=-\Delta n$ with $L_{\rm vac}\sim L$ at $\nu=194$ THz, the lead bound is $1.5\times10^{-13}$/yr per 100$\mu$W. Models requiring $\gtrsim10^{-12}$/yr are excluded only if $\ge1\%$ excursions can be established. The $10^{-19}$ target is $\sim$6 orders below the 10\% projection and requires measured variation.
 
-Target $10^{-19}$ is $\sim6$ orders below 10\% projection. Requires measured variation.
+\section{Systematics and discussion}
+\label{sec:sys}
+The leading systematic is power-dependent drift itself: Robinson et al.\ (Si4, 4K) found drift linear in incident power, lowest $-3\times10^{-19}$/s at 40 nW transmitted and extrapolating to zero at zero power, with DC intensity coupling $1\times10^{-12}$/$\mu$W and power stabilized to pW \cite{robinson2019}. Any grooving signal must be disentangled from this effect; its mechanism is the key open question. The DC photothermal numbers that matter are offsets $\propto P$, distinct from a drift rate $\propto P$: Matei's $1.7\times10^{-15}$/$\mu$W transmitted at 124K \cite{matei2017} and Robinson's $1\times10^{-12}$/$\mu$W at 4K \cite{robinson2019}. Dynamic photothermal response was characterized on GW-like dielectric coatings at 1064 nm \cite{farsi2011}, not on these mirrors; dither waveforms separate offset from slope. Power-dependent coating systematics (birefringent and photoinduced noise in crystalline mirrors) are further documented \cite{kedar2023,yu2023}.
 
-\section{Further open data before requesting logs}
-\begin{enumerate}
-\item Differential Si2-Si3: Matei et al.\ PRL 118, 263202 (2017) reports $100\,\mu$Hz/s relative drift \cite{matei2017}. Common-mode maser drift cancels. Power differences are undocumented, but Matei et al.\ measured the DC photothermal coefficient $1.7(2)\times10^{-15}$ per $\mu$W transmitted for both cavities and run with no active intensity stabilization \cite{matei2017}, so multi-\% drifts over years are plausible and the logs would settle it. Differential $\alpha$ bound cleaner.
-\item Power-dependent drift already seen: Robinson et al.\ (Si4, 4K) found drift linear in incident power, lowest $-3\times10^{-19}$/s at 40 nW transmitted and extrapolating to zero at zero power, with DC intensity coupling $1\times10^{-12}$/$\mu$W and power stabilized to pW \cite{robinson2019}. Any grooving signal must be disentangled from this effect; its mechanism is the key systematic of this search. Crystalline-coating power-dependent systematics (birefringent and photoinduced noise) are further documented \cite{kedar2023,yu2023}.
-\item Zhang et al.\ PRL 119, 243601 (2017) bounded 4K drift at $<1$ mHz/s ($5\times10^{-18}$/s) over 3 days \cite{zhang2017}; long-term 4K drift is unreported, so $\beta_{Si}\approx0$ at 4K is an extrapolation, not a measurement.
-\item Dynamic photothermal response $H^{(PT)}(f)$ was characterized on GW-like dielectric coatings at 1064 nm, room and cryogenic \cite{farsi2011}, but not on these mirrors: the DC numbers that matter are Matei's $1.7\times10^{-15}$/$\mu$W transmitted at 124K \cite{matei2017} and Robinson's $1\times10^{-12}$/$\mu$W at 4K \cite{robinson2019} --- both frequency offsets $\propto P$, distinct from a drift rate $\propto P$. Dither waveforms separate offset from slope.
-\end{enumerate}
+Aging is controlled, not just caveated: for Si2 the windowed treatment (split day 2000: early $-112\pm88$, late $-59\pm12\,\mu$Hz/s) and the joint exponential ($\tau\approx1.8$ yr, $\beta_0=-52\,\mu$Hz/s, residuals $11\,\mu$Hz/s over days $\ge800$) agree, while 1/t gives an unphysical $-4$ asymptote and is disfavored (Fig.~\ref{fig:aging}). The settled-window aging slope is $+2\,\mu$Hz/s/yr.
 
-\section{Limitations: $\beta_{Si}(t)$ aging}
-Fig.~3b shows $1/t$-ish decay of drift rate with age, visible for Si2 from $\sim$$-200$ to $-57\,\mu$Hz/s over 10yr. Constant-$\beta$ is limitation of this note.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.85\linewidth]{figures/fig2_si2_aging.pdf}
+\caption{Si2 aging treatments compared: window medians (split day 2000, dashed) and joint exponential ($\tau\approx1.8$ yr, solid) vs 1/t (dotted) over days $\ge800$. Residuals $\approx$11--12 $\mu$Hz/s under both viable treatments.}
+\label{fig:aging}
+\end{figure}
 
-Cheapest fixes, in order:
-\begin{itemize}
-\item (a) Split record into early/late windows with separate $\beta$ per window: 2 extra parameters, kills most bias. Works for Si2 settled vs unsettled. Implement as $\beta(t)=\beta_{\rm early}$ for $t<t_{\rm split}$, $\beta_{\rm late}$ else.
-\item (b) Fit $\beta(t)=\beta_0+\beta_1/t$ or $\beta_0+\beta_1\exp(-t/\tau)$ jointly with $\alpha$: more principled, matches visible decay. Exponential fitted for Si2 (days $\ge800$): $\tau\approx1.8$ yr, $\beta_0=-52\,\mu$Hz/s, residuals $11\,\mu$Hz/s, matching the windowed-late scatter; 1/t gives an unphysical $-4$ asymptote and is disfavored.
-\item (c) Do nothing here, but caveat: for this note we fit settled window only (last 3 yr) where $\beta(t)$ approximately constant, and note constant-$\beta$ as limitation. Full analysis will model aging.
-\end{itemize}
-For this note we adopt (c): use settled window Si2 $-57\pm8\,\mu$Hz/s where aging slope $<5\,\mu$Hz/s/yr, and state constant-$\beta$ limitation explicitly. Future work with $P_{\rm trans}(t)$ logs will adopt (a) or (b). Code supports (a) via \texttt{beta\_window\_edges} and (b) via \texttt{fit\_exp\_aging} ($\tau$ grid search + WLS), both validated on synthetic decaying-$\beta$ logs where single-$\beta$ flips sign.
+Maser reference drift is common-mode and $\sim$$10\times$ below cavity drift \cite{lee2026}. Long-term 4K drift remains unreported (Zhang et al.\ bounded $<1$ mHz/s over 3 days \cite{zhang2017}), so the cleanest $\beta\approx0$ regime is still to be exploited. A differential Si2--Si3 analysis would cancel common-mode terms; Matei et al.\ report $100\,\mu$Hz/s relative drift and run with no active intensity stabilization \cite{matei2017}, so the auxiliary logs may already contain usable power variation.
 
-\section{Outlook to $10^{-19}$}
-\begin{itemize}
-\item \textbf{Free}: Request 10-day mean $P_{\rm trans}, T_{\rm cryo}, \mathcal{F}$ 2015-2026 from PTB (Legero/Sterr) and JILA (Ye). Even single 10\% power step during commissioning improves bound to $10^{-13}$.
-\item \textbf{2-month dither}: Run Si6 alternating 13.5 mW / 27 mW monthly and synchronously demodulate the slope difference, in which common drift $\beta$ cancels. With per-month repeatability $\sigma_m$ (beta wander + thermal; Allan floor $\sim2\times10^{-11}$ Hz/s negligible), $\sigma_\alpha=\sqrt{2}\sigma_m/(\Delta P\sqrt{K})$ over $K$ month-pairs, i.e. $\Delta n/{\rm yr}\approx1.7\times10^{-15}(\sigma_m/1\,\mu{\rm Hz/s})/\sqrt{K}$ per 100$\mu$W: $1.7\times10^{-15}$ in 2 months ($K=1$), $7.0\times10^{-16}$ in one alternating year ($K=6$) at optimistic $\sigma_m=1\,\mu$Hz/s; $5.1\times10^{-15}$ / $2.1\times10^{-15}$ at realistic $\sigma_m=3\,\mu$Hz/s.
-\item \textbf{Cross-lab}: $\alpha_{PTB}$ vs $\alpha_{JILA}$ at same vacuum, different mounts/coatings. Common $\alpha$ with same sign $\propto P$ would disfavor material creep.
-\end{itemize}
+\section{Outlook}
+Requesting 10-day means of $P_{\rm trans}$, $T_{\rm cryo}$, and $\mathcal{F}$ (2015--2026) from PTB and JILA costs nothing and unlocks the full regression; even a single 10\% power step during commissioning reaches $\sim$$10^{-13}$. An intentional Si6 dither, alternating 13.5/27 mW monthly with synchronous demodulation (common drift cancels), reaches $\sigma_\alpha=\sqrt{2}\sigma_m/(\Delta P\sqrt{K})$ over $K$ month-pairs, i.e.\ $\Delta n/{\rm yr}\approx1.7\times10^{-15}(\sigma_m/1\,\mu{\rm Hz/s})/\sqrt{K}$ per 100$\mu$W: $1.7\times10^{-15}$ in 2 months ($K=1$), $7.0\times10^{-16}$ in one alternating year ($K=6$) at optimistic $\sigma_m=1\,\mu$Hz/s ($5.1\times10^{-15}$ / $2.1\times10^{-15}$ at realistic $\sigma_m=3\,\mu$Hz/s; Allan floor $\sim2\times10^{-11}$ Hz/s negligible). Cross-lab comparison of $\alpha_{PTB}$ vs $\alpha_{JILA}$ at matched vacuum would test common-mode origin.
 
-Data and code: \url{https://github.com/pleblond/vacuum-grooving-bound} (validation notebook, digitization).
+\section*{Data and code availability}
+Analysis code, digitization, figures, and the CSV record: \url{https://github.com/pleblond/vacuum-grooving-bound} (30/30-test suite, validation notebook, \texttt{examples/make\_figures.py} reproduces the figures). Please cite the repository (see \texttt{CITATION.cff}) and Lee et al.\ \cite{lee2026} when using the digitized record.
 
 \begin{thebibliography}{99}
 \bibitem{lee2026} J. Lee et al., PRL 136, 033801 (2026), arXiv:2509.13503.
