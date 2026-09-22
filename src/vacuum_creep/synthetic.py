@@ -18,6 +18,8 @@ def make_synthetic(
     nu0_Hz: float = 194.4e12,
     f_finesse: float = 5e5,
     beta_Si: float = 1e-6,
+    beta_1: float = 0.0,
+    beta_tau_s: float = 0.0,
     alpha: float = 0.0,
     gamma: float = 20.0,
     gamma2: float = 0.0,
@@ -49,12 +51,15 @@ def make_synthetic(
         temp_wander_K = offset_K + trend_K + meas_noise_K
         true_wander_K = offset_K + trend_K  # what the cavity actually feels
         steps = np.arange(n) * dt_s
+        beta_now = beta_Si + (
+            beta_1 * np.exp(-t / beta_tau_s) if beta_tau_s > 0 else 0.0
+        )
         # Model-consistent signal: (beta + alpha*P) * t + gamma * integral(dT).
         # The per-epoch slope regression then sees gamma * mean(dT) to first
         # order, while the cumulative fit sees the exact integral.
         nu = (
             nu_offset
-            + (beta_Si + alpha * p_circ + gamma2 * offset_K**2) * steps
+            + (beta_now + alpha * p_circ + gamma2 * offset_K**2) * steps
             + gamma * np.cumsum(true_wander_K) * dt_s
             + rng.standard_normal(n) * freq_noise_Hz
         )

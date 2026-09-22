@@ -13,7 +13,7 @@
 \begin{abstract}
 We propose a search for cumulative vacuum refractive index creep, $\Delta n_{\rm vac}(t)=\alpha_E \int P_{\rm circ} I_{\rm on} dt$, using long-term drift logs of cryogenic single-crystal silicon cavities. Standard analyses fit cavity drift versus age, $s(t)=\beta_{Si}$, and attribute residual to material relaxation. We introduce Protocol v3.1: $s_i = \beta_{Si}(t) + \alpha \langle P_{\rm circ}\rangle_i + \gamma_1\Delta T_i + \gamma_2\Delta T_i^2$, with finesse aging $P_{\rm circ}=P_{\rm trans}\mathcal{F}/\pi$ and raw frequency (no unwrap needed for published frequency; see Sec.~2). 
 
-Pipeline validated on synthetic null and injected $\alpha=3\times10^{-4}$: 25/25 tests pass, null $\hat\alpha=-6.4\pm4.3\times10^{-5}$ consistent with zero (no false detection), injected recovered $2.36\pm0.43\times10^{-4}$, $R^2>0.999$, $\gamma$ recovers its injected value.
+Pipeline validated on synthetic null and injected $\alpha=3\times10^{-4}$: 30/30 tests pass, null $\hat\alpha=-6.4\pm4.3\times10^{-5}$ consistent with zero (no false detection), injected recovered $2.36\pm0.43\times10^{-4}$, $R^2>0.999$, $\gamma$ recovers its injected value.
 
 Using only published Fig.~3b from Lee et al., PRL 136, 033801 (2026) \cite{lee2026} for Si2, Si3, Si5 (124K) and Si6 (17K) over $>10$yr, digitized settled drifts are Si2 $-57\pm8$, Si3 $-20\pm4$, Si5 $-18\pm13$, Si6 $+18\pm13$ $\mu$Hz/s, with Si2 integral $-29.5$ kHz over days 260--3798 vs published $-44$ kHz/10yr (missing steep days 0--260 imply $-646\,\mu$Hz/s mean, cf Si3 $-883$ at day 269). No $P_{\rm trans}(t)$ is published. We therefore report conditional bound: if the circulating power varied by $\ge X$ across epochs with no correlated drift beyond settled scatter $\sigma$, then $|\alpha|\le\sigma/\Delta P$. For Si6 settled $\sigma=12.5\,\mu$Hz/s at $P_{\rm circ}\approx13.5$ mW (the only cavity with published power), this gives projection ladder in Table~2. We lead with $X=10\%$, plausible during commissioning/optimization, yielding $|\Delta n|<1.5\times10^{-13}$/yr per 100\,$\mu$W in cryogenic UHV at 17--124K. Ladder is $1.5\times10^{-12}$ (1\%), $1.5\times10^{-13}$ (10\%), $1.5\times10^{-14}$ (factor 2). Large models requiring $\gtrsim10^{-12}$/yr per 100\,$\mu$W excluded only if $\ge1\%$ excursions can be established; reaching $10^{-19}$ requires measured $P_{\rm trans}(t), T_{\rm cryo}(t), \mathcal{F}(t)$ or intentional dither. Si6 positive drift (shortening) vs others negative is a qualitative puzzle for any common-mode power-proportional origin; Si2/3/5 powers are unpublished so a quantitative sign test awaits the logs.
 \end{abstract}
@@ -58,7 +58,7 @@ Null $\alpha=0$ & $-6.4e-05\pm4.3e-05$ & consistent zero, no false detection \\
 Injected $\alpha=3e-4$ & $2.36e-04\pm4.3e-05$ & 20\% low (1.5$\sigma$ seed noise), $R^2>0.999$ \\
 Thermal deconfound & $\gamma$ recovers injected value & validated \\
 Finesse/proxy & $\mathcal{F}$ vs $P_{\rm trans}$ agreement & validated \\
-Fail-safe & 25/25 tests pass & \\
+Fail-safe & 30/30 tests pass & \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -122,7 +122,7 @@ Cheapest fixes, in order:
 \item (b) Fit $\beta(t)=\beta_0+\beta_1/t$ or $\beta_0+\beta_1\exp(-t/\tau)$ jointly with $\alpha$: more principled, matches visible decay. Exponential fitted for Si2 (days $\ge800$): $\tau\approx1.8$ yr, $\beta_0=-52\,\mu$Hz/s, residuals $11\,\mu$Hz/s, matching the windowed-late scatter; 1/t gives an unphysical $-4$ asymptote and is disfavored.
 \item (c) Do nothing here, but caveat: for this note we fit settled window only (last 3 yr) where $\beta(t)$ approximately constant, and note constant-$\beta$ as limitation. Full analysis will model aging.
 \end{itemize}
-For this note we adopt (c): use settled window Si2 $-57\pm8\,\mu$Hz/s where aging slope $<5\,\mu$Hz/s/yr, and state constant-$\beta$ limitation explicitly. Future work with $P_{\rm trans}(t)$ logs will adopt (a) or (b). Code already supports (a) via \texttt{beta\_window\_edges} flag.
+For this note we adopt (c): use settled window Si2 $-57\pm8\,\mu$Hz/s where aging slope $<5\,\mu$Hz/s/yr, and state constant-$\beta$ limitation explicitly. Future work with $P_{\rm trans}(t)$ logs will adopt (a) or (b). Code supports (a) via \texttt{beta\_window\_edges} and (b) via \texttt{fit\_exp\_aging} ($\tau$ grid search + WLS), both validated on synthetic decaying-$\beta$ logs where single-$\beta$ flips sign.
 
 \section{Outlook to $10^{-19}$}
 \begin{itemize}

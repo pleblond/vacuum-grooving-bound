@@ -49,6 +49,7 @@ class PipelineConfig:
     cumulative_fit: bool = True  # also run the E_cum cross-check fit
     beta_window_edges: tuple[float, ...] = ()  # split times [s]; [] = one beta
     fit_quadratic_thermal: bool = False  # add gamma2*dT^2 (124 K crossing)
+    fit_exp_aging: bool = False  # joint b0+b1*exp(-t/tau) (option b; windows win)
 
 
 @dataclass
@@ -64,7 +65,7 @@ class EpochResult:
 
 @dataclass
 class GroovingFit:
-    beta_Si: float  # single-window beta, or the LAST window's beta if split
+    beta_Si: float  # single-window beta; LAST window if split; asymptote b0 if exp
     alpha: float
     gamma: float
     se_beta: float
@@ -76,6 +77,7 @@ class GroovingFit:
     beta_per_window: tuple[float, ...] = ()  # all window betas, time order
     gamma2: float = 0.0  # dT^2 coefficient (0 unless fit_quadratic_thermal)
     se_gamma2: float = 0.0
+    aging_tau_s: float = 0.0  # exp-aging tau (0 unless fit_exp_aging)
 
 
 @dataclass
@@ -243,29 +245,8 @@ def unwrap_beat_phase(phase_rad: np.ndarray) -> np.ndarray:
     return np.unwrap(np.asarray(phase_rad, dtype=float))
 
 
-def fit_grooving_model(epochs: list[EpochResult], cfg: PipelineConfig) -> Optional[GroovingFit]:
-    quad = bool(cfg.fit_quadratic_thermal)
-    edges = tuple(sorted(cfg.beta_window_edges))
-    t_mid = np.array([e.t_mid_s for e in epochs])
-    win = np.digitize(t_mid, edges) if edges else np.zeros(len(epochs), dtype=int)
-    n_win = int(win.max()) + 1 if len(epochs) else 1
-    n_param = n_win + 2 + (1 if quad else 0)
-    if len(epochs) < n_param + 1:  # need residual dof
-        return None
-    s = np.array([e.slope_Hz_per_s for e in epochs])
-    p = np.array([e.p_mean_W for e in epochs])
-    d = np.array([e.dt_mean_K for e in epochs])
-    cols = [(win == k).astype(float) for k in range(n_win)] + [p, d]
-    if quad:
-        cols.append(d**2)
-    X = np.column_stack(cols)
-
-    if cfg.allan_Hz is not None and cfg.allan_Hz > 0:
-        w = np.full_like(s, 1.0 / cfg.allan_Hz**2)
-    else:
-        se = np.array([e.slope_se_Hz_per_s for e in epochs])
-        se = np.where(np.isfinite(se) & (se > 0), se, np.median(se[np.isfinite(se) & (se > 0)]))
-        w = 1.0 / se**2
+def _wls(X: np.ndarray, s: np.ndarray, w: np.ndarray, n_param: int):
+    """Weighted least squares; None when rank-deficient or singular."""
     sqrt_w = np.sqrt(w)
     Xw, sw = X * sqrt_w[:, None], s * sqrt_w
     coeffs, _, rank, _ = np.linalg.lstsq(Xw, sw, rcond=None)
@@ -281,20 +262,112 @@ def fit_grooving_model(epochs: list[EpochResult], cfg: PipelineConfig) -> Option
     se_vec = np.sqrt(np.maximum(np.diag(cov), 0.0))
     ss_tot = float(np.sum((sw - sw.mean()) ** 2))
     r2 = float(1.0 - resid @ resid / ss_tot) if ss_tot > 0 else 0.0
-    betas = tuple(float(c) for c in coeffs[:n_win])
+    return coeffs, se_vec, r2, float(resid @ resid)
+
+
+def _epoch_weights(epochs: list[EpochResult], cfg: PipelineConfig, n: int) -> np.ndarray:
+    if cfg.allan_Hz is not None and cfg.allan_Hz > 0:
+        return np.full(n, 1.0 / cfg.allan_Hz**2)
+    se = np.array([e.slope_se_Hz_per_s for e in epochs])
+    se = np.where(np.isfinite(se) & (se > 0), se, np.median(se[np.isfinite(se) & (se > 0)]))
+    return 1.0 / se**2
+
+
+def fit_grooving_model(epochs: list[EpochResult], cfg: PipelineConfig) -> Optional[GroovingFit]:
+    quad = bool(cfg.fit_quadratic_thermal)
+    edges = tuple(sorted(cfg.beta_window_edges))
+    t_mid = np.array([e.t_mid_s for e in epochs])
+    s = np.array([e.slope_Hz_per_s for e in epochs])
+    p = np.array([e.p_mean_W for e in epochs])
+    d = np.array([e.dt_mean_K for e in epochs])
+    kind = "P_trans_proxy" if cfg.use_trans_proxy else "P_circ"
+
+    if edges:  # option (a): windowed aging intercepts
+        win = np.digitize(t_mid, edges)
+        n_win = int(win.max()) + 1
+        n_param = n_win + 2 + (1 if quad else 0)
+        if len(epochs) < n_param + 1:
+            return None
+        cols = [(win == k).astype(float) for k in range(n_win)] + [p, d]
+        if quad:
+            cols.append(d**2)
+        out = _wls(np.column_stack(cols), s, _epoch_weights(epochs, cfg, len(s)), n_param)
+        if out is None:
+            return None
+        coeffs, se_vec, r2, _ = out
+        betas = tuple(float(c) for c in coeffs[:n_win])
+        return GroovingFit(
+            beta_Si=float(coeffs[n_win - 1]),
+            alpha=float(coeffs[n_win]),
+            gamma=float(coeffs[n_win + 1]),
+            se_beta=float(se_vec[n_win - 1]),
+            se_alpha=float(se_vec[n_win]),
+            se_gamma=float(se_vec[n_win + 1]),
+            r_squared=r2,
+            n_epochs=len(epochs),
+            power_kind=kind,
+            beta_per_window=betas,
+            gamma2=float(coeffs[n_win + 2]) if quad else 0.0,
+            se_gamma2=float(se_vec[n_win + 2]) if quad else 0.0,
+        )
+
+    if cfg.fit_exp_aging:  # option (b): joint b0 + b1*exp(-t/tau)
+        span = float(t_mid.max() - t_mid.min())
+        if span <= 0 or len(epochs) < 6:
+            return None
+        n_param = 4 + (1 if quad else 0)
+        if len(epochs) < n_param + 1:
+            return None
+        w = _epoch_weights(epochs, cfg, len(s))
+        t0 = float(t_mid.min())
+        best = None
+        for tau in np.logspace(np.log10(span / 50.0), np.log10(span * 5.0), 25):
+            cols = [np.ones_like(s), np.exp(-(t_mid - t0) / tau), p, d]
+            if quad:
+                cols.append(d**2)
+            out = _wls(np.column_stack(cols), s, w, n_param)
+            if out is not None and (best is None or out[3] < best[0]):
+                best = (out[3], out[0], out[1], out[2], float(tau))
+        if best is None:
+            return None
+        _, coeffs, se_vec, r2, tau = best
+        return GroovingFit(
+            beta_Si=float(coeffs[0]),
+            alpha=float(coeffs[2]),
+            gamma=float(coeffs[3]),
+            se_beta=float(se_vec[0]),
+            se_alpha=float(se_vec[2]),
+            se_gamma=float(se_vec[3]),
+            r_squared=r2,
+            n_epochs=len(epochs),
+            power_kind=kind,
+            gamma2=float(coeffs[4]) if quad else 0.0,
+            se_gamma2=float(se_vec[4]) if quad else 0.0,
+            aging_tau_s=tau,
+        )
+
+    n_param = 3 + (1 if quad else 0)  # single beta (+ optional dT^2)
+    if len(epochs) < n_param + 1:
+        return None
+    cols = [np.ones_like(s), p, d]
+    if quad:
+        cols.append(d**2)
+    out = _wls(np.column_stack(cols), s, _epoch_weights(epochs, cfg, len(s)), n_param)
+    if out is None:
+        return None
+    coeffs, se_vec, r2, _ = out
     return GroovingFit(
-        beta_Si=float(coeffs[n_win - 1]),
-        alpha=float(coeffs[n_win]),
-        gamma=float(coeffs[n_win + 1]),
-        se_beta=float(se_vec[n_win - 1]),
-        se_alpha=float(se_vec[n_win]),
-        se_gamma=float(se_vec[n_win + 1]),
+        beta_Si=float(coeffs[0]),
+        alpha=float(coeffs[1]),
+        gamma=float(coeffs[2]),
+        se_beta=float(se_vec[0]),
+        se_alpha=float(se_vec[1]),
+        se_gamma=float(se_vec[2]),
         r_squared=r2,
         n_epochs=len(epochs),
-        power_kind="P_trans_proxy" if cfg.use_trans_proxy else "P_circ",
-        beta_per_window=betas,
-        gamma2=float(coeffs[n_win + 2]) if quad else 0.0,
-        se_gamma2=float(se_vec[n_win + 2]) if quad else 0.0,
+        power_kind=kind,
+        gamma2=float(coeffs[3]) if quad else 0.0,
+        se_gamma2=float(se_vec[3]) if quad else 0.0,
     )
 
 
@@ -381,8 +454,10 @@ def run_pipeline(df: pd.DataFrame, cfg: Optional[PipelineConfig] = None) -> Pipe
         res.notes.append("Quadratic thermal gamma2*dT^2 included (124 K crossing).")
     res.grooving = fit_grooving_model(res.epochs, cfg)
     if res.grooving is None:
-        res.notes.append("Grooving regression rank-deficient or <4 epochs. No bound.")
+        res.notes.append("Grooving regression rank-deficient or too few epochs. No bound.")
         return res
+    if res.grooving.aging_tau_s > 0:
+        res.notes.append(f"Exp aging fitted jointly (tau={res.grooving.aging_tau_s:.3g} s).")
     res.alpha_bound_95, res.dn_per_year_bound_95 = bound_from_fit(res.grooving, cfg)
     if cfg.cumulative_fit:
         res.cumulative = fit_cumulative_model(prepared, cfg)

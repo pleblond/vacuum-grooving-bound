@@ -125,3 +125,24 @@ def test_windowed_fit_needs_residual_dof():
     df = make_synthetic(n_epochs=4, seed=4)
     res = run_pipeline(df, PipelineConfig(beta_window_edges=(1e4, 2e4, 3e4)))
     assert res.grooving is None  # 4 windows + P + T > epochs: fail safe
+
+
+def test_joint_exp_aging_removes_decay_bias():
+    import numpy as np
+
+    from vacuum_creep.pipeline import PipelineConfig, run_pipeline
+    from vacuum_creep.synthetic import make_synthetic
+
+    base = np.linspace(0.5e-6, 3.0e-6, 16)
+    levels = tuple(base * np.array([1.0, 0.75, 1.25, 0.9] * 4))
+    df = make_synthetic(n_epochs=16, alpha=3e-4, beta_Si=1e-4,
+                        beta_1=6e-4, beta_tau_s=80000.0,
+                        p_trans_levels_W=levels, seed=31)
+
+    single = run_pipeline(df, PipelineConfig()).grooving
+    joint = run_pipeline(df, PipelineConfig(fit_exp_aging=True)).grooving
+    assert single is not None and joint is not None
+    assert single.alpha < 0  # decay + rising power flips single-beta badly
+    assert abs(joint.alpha - 3e-4) / 3e-4 < 0.30
+    assert 0.5 < joint.aging_tau_s / 80000.0 < 2.0
+    assert abs(joint.alpha - 3e-4) < abs(single.alpha - 3e-4)

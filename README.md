@@ -35,7 +35,7 @@ src/vacuum_creep/
   cli.py         command-line runner (CSV or --synthetic)
 docs/            the protocol source (.tex)
 examples/run_demo.py   null + injected end-to-end demo
-tests/           29 pytest checks (recovery, deconfounding, validation)
+tests/           30 pytest checks (recovery, deconfounding, validation)
 ```
 
 ## Quick start
@@ -54,7 +54,7 @@ Input CSV columns: `time_s, nu_corr_Hz, P_trans_W, temp_K, is_on`
 
 ## Validation status
 
-- 29/29 pytest checks pass: null gives a tight bound, injected
+- 29/30 pytest checks pass: null gives a tight bound, injected
   `α = 3e-4 Hz/s/W` is recovered to ~20%, `γ` recovers its true value,
   finesse/proxy modes agree in sign, short epochs fail safe (no fit, no crash).
 - Demo output (10 synthetic epochs, seed 3): null → `|α| ≤ 1.5e-04`,
