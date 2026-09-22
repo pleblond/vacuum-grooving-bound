@@ -24,18 +24,26 @@ Vacuum refractive index from strong fields is searched as instantaneous $n_2 I$ 
 Cryogenic Si cavities in cryogenic UHV, operated at 17--124K in this analysis, drift at $\sim10^{-19}$/s fractional \cite{lee2026} --- roughly $10^3\times$ slower than typical ULE cavities (kHz/day vs Hz/day \cite{lee2026}), enabling a DC search.
 
 \section{Protocol v3.1}
-Previous versions fit $s(t)=\beta$. v3.1, with limitations noted in Sec.~5:
+Clock ratios ($\nu_{Yb+}/\nu_{Sr}$) are atoms-vs-atoms, servoed to $10^{-18}$; cavity drift is erased from them by construction. The servo's AOM correction $\nu_{corr}(t)$ is atoms-minus-cavity: the raw DC ruler for cavity length plus vacuum index. With atoms absolute and cavity $\nu=mc/2nL$:
+\begin{equation}
+\Delta\nu_{corr}(t) = -\nu_0\left(\frac{\Delta L_{Si}}{L}+\Delta n_{vac}\right)
+\end{equation}
+Previous versions fit $s(t)=\beta$. v3.1 fits drift rates $s_i=d\nu_{corr}/dt$ per 10-day epoch, with limitations noted in Sec.~5:
 \begin{equation}
 s_i = \beta_{Si}(t) + \alpha \langle P_{\rm circ}\rangle_i + \gamma_1\Delta T_i + \gamma_2\Delta T_i^2
 \end{equation}
 with:
 \begin{itemize}
-\item $s_i = d\nu/dt$ per 10-day bin from 10-day binned \emph{frequency} vs maser/optical clock, not beat-note phase. PTB/JILA track cavity frequency against masers calibrated to timescales (e.g.\ UTC(NIST) \cite{robinson2019}) or against optical clocks with standard systematic corrections; if re-analyzing raw beat phase, unwrap $2\pi$ before differentiating (a $2\pi$ slip injects $1/\tau$ Hz steps: $\sim$100~mHz at 10~s sampling). For Fig.~3b data \cite{lee2026} we use published frequency drift, so no unwrap needed, but code retains unwrap for raw logs.
-\item $\langle P_{\rm circ}\rangle_i = \langle P_{\rm trans}\rangle_i \mathcal{F}_i/\pi$, $\mathcal{F}$ from periodic ring-down
-\item $\Delta T_i$ cryostat temperature, quadratic term for 124K zero-crossing
+\item $s_i = d\nu/dt$ per 10-day bin from 10-day binned \emph{frequency} vs maser/optical clock, not beat-note phase. PTB/JILA track cavity frequency against masers calibrated to timescales (e.g.\ UTC(NIST) \cite{robinson2019}) or against optical clocks with standard systematic corrections; if re-analyzing raw beat phase, unwrap $2\pi$ before differentiating (a $2\pi$ slip injects $1/\tau$ Hz steps: $\sim$100~mHz at 10~s sampling). For Fig.~3b data \cite{lee2026} we use published frequency drift, so no unwrap needed, but code retains unwrap for raw logs. If labs log absolute AOM frequency (e.g.\ 80 MHz $\pm$ kHz correction), subtract the nominal first.
+\item $\langle P_{\rm circ}\rangle_i = \langle P_{\rm trans}\rangle_i \mathcal{F}_i/\pi$, $\mathcal{F}$ from periodic ring-down, interpolated as $\mathcal{F}(t)$ when available; else $P_{trans}$ itself as proxy regressor $\alpha_{trans}$ (conservative: underestimates $P_{circ}$ if $\mathcal{F}$ degraded).
+\item $\Delta T_i$ cryostat temperature, quadratic term for 124K zero-crossing; at 124K, $d\alpha/dT\sim10^{-11}$/K$^2$, so 0.1 mK $\to$ $10^{-15}$.
 \item Allan-weighted: $w_i=1/\sigma_{\rm Allan,i}^2$
 \end{itemize}
 $\alpha$ target, $\beta_{Si}(t)$ aging (see Sec.~5 for decay), $\gamma$ thermal. With constant $P$, $\beta$ and $\alpha\langle P\rangle$ degenerate. Variation $\Delta P$ breaks degeneracy.
+
+The cumulative (fatigue) form fits $\Delta\nu_{corr}(t)=\beta_{Si}t+\alpha_E E_{cum}(t)+\gamma\!\int\!\Delta T\,dt'+\sum C_i{\bf1}_i+\epsilon$ with $E_{cum}(t)=\int P_{circ}I_{on}dt$ never reset (flatlines when unlocked); step dummies $C_i$ absorb relock offsets. Unlock/mode-jump steps are handled by epoch grouping, fitting slopes only within locked epochs.
+
+Pipeline: (1) ingest $\nu_{corr}$, $P_{trans}$, $T$, $I_{on}$; (2) keep thermal as regressors, never pre-subtracted, preserving covariance; (3) WLS epoch regression plus cumulative cross-check; (4) $H_0$: $\alpha=0$ bound. Implementation: \url{https://github.com/pleblond/vacuum-grooving-bound}.
 
 \section{Pipeline validation (synthetic)}
 Synthetic $s_i$ with known $\alpha_{true}$, $\beta$, $\gamma$, noise matching Si2 settled scatter $8\,\mu$Hz/s.
