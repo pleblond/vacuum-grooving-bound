@@ -10,9 +10,10 @@ AOM-correction logs.
 
 Existing vacuum-nonlinearity searches test only instantaneous responses,
 assuming a vacuum with zero memory; cavity drift is treated as background
-and subtracted. No prior study has tested or bounded cumulative vacuum
-hysteresis — this repository establishes the first quantitative upper
-bounds from published open drift records.
+and subtracted. This search is different: it looks for persistence ---
+whether integrated photon dose leaves a lasting imprint on the vacuum
+index. No prior study has tested or bounded it; this repository establishes
+the first quantitative upper bounds from published open drift records.
 
 ## Background
 
