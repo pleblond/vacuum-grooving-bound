@@ -94,6 +94,7 @@ If you use this code or analysis, please cite the software and the paper
   author  = {Leblond, Philippe},
   title   = {{vacuum-grooving-bound}},
   url     = {https://github.com/pleblond/vacuum-grooving-bound},
+  doi     = {10.5281/zenodo.22886215},
   license = {MIT},
   year    = {2026}
 }

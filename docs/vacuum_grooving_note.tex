@@ -129,7 +129,7 @@ Maser reference drift is common-mode and $\sim$$10\times$ below cavity drift \ci
 Requesting 10-day means of $P_{\rm trans}$, $T_{\rm cryo}$, and $\mathcal{F}$ (2015--2026) from PTB and JILA costs nothing and unlocks the full regression; even a single 10\% power step during commissioning reaches $\sim$$10^{-13}$. An intentional Si6 dither, alternating 13.5/27 mW monthly with synchronous demodulation (common drift cancels), reaches $\sigma_\alpha=\sqrt{2}\sigma_m/(\Delta P\sqrt{K})$ over $K$ month-pairs, i.e.\ $\Delta n/{\rm yr}\approx1.7\times10^{-15}(\sigma_m/1\,\mu{\rm Hz/s})/\sqrt{K}$ per 100$\mu$W: $1.7\times10^{-15}$ in 2 months ($K=1$), $7.0\times10^{-16}$ in one alternating year ($K=6$) at optimistic $\sigma_m=1\,\mu$Hz/s ($5.1\times10^{-15}$ / $2.1\times10^{-15}$ at realistic $\sigma_m=3\,\mu$Hz/s; Allan floor $\sim2\times10^{-11}$ Hz/s negligible). Cross-lab comparison of $\alpha_{PTB}$ vs $\alpha_{JILA}$ at matched vacuum would test common-mode origin.
 
 \section*{Data and code availability}
-Analysis code, digitization, figures, and the CSV record: \url{https://github.com/pleblond/vacuum-grooving-bound} (30/30-test suite, validation notebook, \texttt{examples/make\_figures.py} reproduces the figures). Please cite the repository (see \texttt{CITATION.cff}) and Lee et al.\ \cite{lee2026} when using the digitized record.
+Analysis code, digitization, figures, and the CSV record: \url{https://github.com/pleblond/vacuum-grooving-bound}, release v1.0 archived at Zenodo \cite{zenodo2026} (30/30-test suite, validation notebook, \texttt{examples/make\_figures.py} reproduces the figures). Please cite the repository (see \texttt{CITATION.cff}) and Lee et al.\ \cite{lee2026} when using the digitized record.
 
 \begin{thebibliography}{99}
 \bibitem{lee2026} J. Lee et al., PRL 136, 033801 (2026), arXiv:2509.13503.
@@ -147,6 +147,7 @@ Analysis code, digitization, figures, and the CSV record: \url{https://github.co
 \bibitem{kennedy2020} C. J. Kennedy et al., PRL 125, 201302 (2020).
 \bibitem{kedar2023} D. Kedar et al., Optica 10, 464 (2023).
 \bibitem{yu2023} J. Yu et al., PRX 13, 041002 (2023).
+\bibitem{zenodo2026} P. Leblond, vacuum-grooving-bound v1.0, Zenodo (2026), doi:10.5281/zenodo.22886216.
 \end{thebibliography}
 
 \end{document}

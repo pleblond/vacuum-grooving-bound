@@ -9,7 +9,15 @@ authors:
     given-names: Philippe
 license: MIT
 repository-code: https://github.com/pleblond/vacuum-grooving-bound
+version: '1.0'
 date-released: '2026-09-22'
+identifiers:
+  - description: Concept DOI (all versions)
+    type: doi
+    value: 10.5281/zenodo.22886215
+  - description: Archived snapshot of version 1.0
+    type: doi
+    value: 10.5281/zenodo.22886216
 preferred-citation:
   type: unpublished
   title: 'First search for cumulative vacuum index creep (''vacuum grooving'')
